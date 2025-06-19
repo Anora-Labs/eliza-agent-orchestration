@@ -77,8 +77,8 @@
 
 ### Contributors ✨
 
-<a href="https://github.com/abdibrokhim/eliza-agent-orchestration/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=abdibrokhim/eliza-agent-orchestration" />
+<a href="https://github.com/Anora-Labs/eliza-agent-orchestration/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Anora-Labs/eliza-agent-orchestration" />
 </a>
 
 
