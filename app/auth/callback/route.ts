@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
-import { APP_PROJECTS_URL } from "@/lib/config"
+import { APP_URL } from "@/lib/config"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
@@ -55,8 +55,8 @@ export async function GET(request: Request) {
     ? `${origin}${next}`
     : forwardedHost
       ? `https://${forwardedHost}${next}`
-      : APP_PROJECTS_URL
-        ? `${APP_PROJECTS_URL}${next}`
+      : APP_URL
+        ? `${APP_URL}${next}`
         : `${origin}${next}`
 
   return NextResponse.redirect(redirectUrl)
