@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
-import LayoutClient from "./layout-client";
+import InfoPage from "./info";
 import { APP_DESCRIPTION } from "@/lib/config";
 import { APP_TITLE } from "@/lib/config";
 
@@ -42,12 +41,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <main className="flex min-h-screen flex-col bg-background">
-          <LayoutClient>
+          <InfoPage>
             {children}
-          </LayoutClient>
+          </InfoPage>
           <Toaster position="top-center" theme="dark" />
         </main>
-        <Analytics />
       </body>
     </html>
   );

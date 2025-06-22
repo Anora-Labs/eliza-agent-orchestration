@@ -4,7 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Providers } from "./providers";
 import { usePathname } from "next/navigation";
 
-export default function LayoutClient({ children }: { children: React.ReactNode }) {
+export default function InfoPage({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const pathname = usePathname();
 
