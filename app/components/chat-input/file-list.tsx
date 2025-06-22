@@ -21,7 +21,7 @@ export function FileList({ files, onFileRemove }: FileListProps) {
           initial={{ height: 0 }}
           animate={{ height: "auto" }}
           exit={{ height: 0 }}
-          transition={TRANSITION}
+          transition={TRANSITION as any}
           className="overflow-hidden"
         >
           <div className="flex flex-row overflow-x-auto px-2">
@@ -32,7 +32,7 @@ export function FileList({ files, onFileRemove }: FileListProps) {
                   initial={{ width: 0 }}
                   animate={{ width: 180 }}
                   exit={{ width: 0 }}
-                  transition={TRANSITION}
+                  transition={TRANSITION as any}
                   className="relative shrink-0 overflow-hidden pt-2"
                 >
                   <FileItem
