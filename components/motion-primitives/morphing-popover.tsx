@@ -79,7 +79,7 @@ export type MorphingPopoverProps = {
 
 function MorphingPopover({
   children,
-  transition = TRANSITION,
+  transition = TRANSITION as any,
   defaultOpen,
   open,
   onOpenChange,

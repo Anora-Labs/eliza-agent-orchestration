@@ -83,7 +83,7 @@ export function FeedbackWidget() {
   return (
     <div className="fixed right-4 bottom-4 z-50">
       <MorphingPopover
-        transition={TRANSITION_POPOVER}
+        transition={TRANSITION_POPOVER as any}
         open={isOpen}
         onOpenChange={setIsOpen}
         className="relative flex flex-col items-end justify-end"
@@ -126,7 +126,7 @@ export function FeedbackWidget() {
                   initial={{ opacity: 0, y: -10, filter: "blur(2px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: 10, filter: "blur(2px)" }}
-                  transition={TRANSITION_CONTENT}
+                  transition={TRANSITION_CONTENT as any}
                 >
                   <div className="rounded-full bg-green-500/10 p-1">
                     <SealCheck className="size-6 text-green-500" />
@@ -146,7 +146,7 @@ export function FeedbackWidget() {
                   initial={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: 10, filter: "blur(2px)" }}
-                  transition={TRANSITION_CONTENT}
+                  transition={TRANSITION_CONTENT as any}
                 >
                   <motion.span
                     aria-hidden="true"
@@ -199,7 +199,7 @@ export function FeedbackWidget() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            transition={TRANSITION_CONTENT}
+                            transition={TRANSITION_CONTENT as any}
                             className="inline-flex items-center gap-2"
                           >
                             <Spinner className="size-4 animate-spin" />
@@ -211,7 +211,7 @@ export function FeedbackWidget() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            transition={TRANSITION_CONTENT}
+                            transition={TRANSITION_CONTENT as any}
                           >
                             Send
                           </motion.span>
