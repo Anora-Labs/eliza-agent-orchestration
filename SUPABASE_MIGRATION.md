@@ -4,10 +4,14 @@ This document outlines how to migrate your habit tracking data from IndexedDB to
 
 ## New Integrations Added
 
-✅ **Mem0 AI Memory System** - Agents now remember conversations and user preferences  
-✅ **Tavily Search Integration** - Real-time web search capabilities for current information
+✅ **Mem0 AI Memory System** - Agents remember conversations and user preferences  
+✅ **Tavily Search Integration** - Real-time web search for current information  
+✅ **Keywords AI Platform** - LLM monitoring, analytics, and access to 250+ AI models
 
-See `MEM0_INTEGRATION.md` and `TAVILY_SEARCH_INTEGRATION.md` for setup details.
+See integration guides:
+- `MEM0_INTEGRATION.md` - AI Memory setup and usage
+- `TAVILY_SEARCH_INTEGRATION.md` - Web search capabilities  
+- `KEYWORDS_AI_INTEGRATION.md` - LLM monitoring and analytics
 
 ## Current Status
 

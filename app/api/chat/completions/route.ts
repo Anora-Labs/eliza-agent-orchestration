@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { memoryService } from "@/lib/memory";
 import { tavilyService } from "@/lib/tavily";
+import { keywordsAIService } from "@/lib/keywords-ai";
 import { createClient } from "@/lib/supabase/server";
 
-const openai = new OpenAI();
+// Initialize OpenAI client with Keywords AI proxy
+const openai = new OpenAI({
+  baseURL: "https://api.keywordsai.co/api",
+  apiKey: process.env.KEYWORDS_AI_API_KEY || process.env.OPENAI_API_KEY,
+});
 
 // Define default functions that all agents can access
 const defaultFunctions = [
@@ -317,11 +322,22 @@ export async function POST(req: Request) {
   try {
     // Extract request parameters
     const { model, messages, functions, function_call, userCache } = await req.json();
-
-    // Set up the completion options
+    
+        // Get user ID for Keywords AI tracking
+    const userId = await getCurrentUserId();
+    
+    // Get Keywords AI parameters
+    const keywordsAIParams = keywordsAIService.getCompletionParams(
+      userId,
+      userCache?.conversationId,
+      { source: 'wei-ai-assistant' }
+    );
+    
+    // Set up the completion options with Keywords AI parameters
     const completionOptions: any = {
       model,
       messages,
+      ...keywordsAIParams,
     };
 
     // Use client-provided functions or default functions
@@ -368,8 +384,9 @@ export async function POST(req: Request) {
         model,
         messages: newMessages,
         functions: completionOptions.functions,
-        function_call: 'auto'
-      });
+        function_call: 'auto',
+        ...keywordsAIParams,
+      } as any);
       
       return NextResponse.json(followUpCompletion);
     }
@@ -402,8 +419,9 @@ export async function POST(req: Request) {
         model,
         messages: newMessages,
         tools: completionOptions.functions.map((fn: any) => ({ type: 'function', function: fn })),
-        tool_choice: 'auto'
-      });
+        tool_choice: 'auto',
+        ...keywordsAIParams,
+      } as any);
       
       return NextResponse.json(followUpCompletion);
     }
@@ -730,6 +748,8 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
     case "searchWeb":
       try {
         console.log("Searching web with query:", args.query);
+        const userIdForSearch = await getCurrentUserId();
+        
         const searchResponse = await tavilyService.search({
           query: args.query,
           topic: args.topic || 'general',
@@ -737,6 +757,16 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
           time_range: args.time_range,
           include_answer: args.include_answer !== false,
         });
+        
+        // Track search operation
+        if (userIdForSearch) {
+          await keywordsAIService.trackSearchOperation(
+            userIdForSearch,
+            'web',
+            args.query,
+            Array.isArray(searchResponse.results) ? searchResponse.results.length : 0
+          );
+        }
         
         return JSON.stringify({
           success: true,
@@ -758,11 +788,23 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
     case "searchNews":
       try {
         console.log("Searching news with query:", args.query);
+        const userIdForNews = await getCurrentUserId();
+        
         const newsResponse = await tavilyService.searchNews(
           args.query,
           Math.min(Math.max(args.max_results || 5, 1), 20),
           args.time_range || 'week'
         );
+        
+        // Track news search operation
+        if (userIdForNews) {
+          await keywordsAIService.trackSearchOperation(
+            userIdForNews,
+            'news',
+            args.query,
+            Array.isArray(newsResponse.results) ? newsResponse.results.length : 0
+          );
+        }
         
         return JSON.stringify({
           success: true,
@@ -784,7 +826,19 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
     case "getQuickAnswer":
       try {
         console.log("Getting quick answer with query:", args.query);
+        const userIdForAnswer = await getCurrentUserId();
+        
         const answer = await tavilyService.getQuickAnswer(args.query);
+        
+        // Track quick answer operation
+        if (userIdForAnswer) {
+          await keywordsAIService.trackSearchOperation(
+            userIdForAnswer,
+            'quick_answer',
+            args.query,
+            1
+          );
+        }
         
         return JSON.stringify({
           success: true,

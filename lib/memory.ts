@@ -6,7 +6,8 @@ const memoryConfig = {
   embedder: {
     provider: 'openai',
     config: {
-      apiKey: process.env.OPENAI_API_KEY || '',
+      apiKey: process.env.KEYWORDS_AI_API_KEY || process.env.OPENAI_API_KEY || '',
+      baseURL: process.env.KEYWORDS_AI_API_KEY ? 'https://api.keywordsai.co/api' : undefined,
       model: 'text-embedding-3-small',
     },
   },
@@ -20,7 +21,8 @@ const memoryConfig = {
   llm: {
     provider: 'openai',
     config: {
-      apiKey: process.env.OPENAI_API_KEY || '',
+      apiKey: process.env.KEYWORDS_AI_API_KEY || process.env.OPENAI_API_KEY || '',
+      baseURL: process.env.KEYWORDS_AI_API_KEY ? 'https://api.keywordsai.co/api' : undefined,
       model: 'gpt-4o-mini',
       temperature: 0.2,
       maxTokens: 1500,
