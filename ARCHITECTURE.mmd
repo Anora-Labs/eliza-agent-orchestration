@@ -1,0 +1,130 @@
+flowchart TB
+ subgraph subGraph0["Frontend Layer"]
+        UI["🎨 Next.js App"]
+        Voice["🎤 Voice Interface<br>WebRTC"]
+        Chat["💬 Chat Interface"]
+        Dashboard["📊 Dashboard"]
+        Habits["✅ Habits"]
+        Rewards["🎁 Rewards"]
+        Profile["👤 Profile"]
+  end
+ subgraph subGraph1["Context Providers"]
+        UserProvider["👤 UserProvider"]
+        ChatProvider["💬 ChatProvider"]
+        DatabaseProvider["💾 DatabaseProvider"]
+        EventProvider["📡 EventProvider"]
+  end
+ subgraph subGraph2["API Layer"]
+        ChatAPI["/api/chat/completions"]
+        AuthAPI["/api/auth/setup"]
+        SessionAPI["/api/session"]
+        CSRFAPI["/api/csrf"]
+  end
+ subgraph subGraph3["AI Infrastructure"]
+        KeywordsAI["🧠 Keywords AI<br>LLM Gateway<br>250+ Models"]
+        OpenAI["🤖 OpenAI<br>Fallback"]
+        Mem0["🧠 Mem0<br>Memory System<br>Vector Storage"]
+        Tavily["🔍 Tavily<br>Real-time Search"]
+  end
+ subgraph subGraph4["AI Agents Ecosystem"]
+        GeneralAgent["🤖 General Agent<br>Primary Assistant"]
+        HabitCoach["🏃 Habit Coach<br>Evidence-based"]
+        UserDataAgent["📊 User Data Agent"]
+        PointsCalc["🎯 Points Calculator"]
+        RewardsManager["🎁 Rewards Manager"]
+        Greeter["👋 Greeter Agent"]
+  end
+ subgraph subGraph5["Functions & Tools"]
+        DatabaseFunctions["📊 Database Functions<br>getUserData()<br>completeHabit()<br>getUserStats()"]
+        MemoryFunctions["🧠 Memory Functions<br>searchMemories()<br>addMemory()<br>getRelevantMemories()"]
+        SearchFunctions["🔍 Search Functions<br>searchWeb()<br>searchNews()<br>getQuickAnswer()"]
+        AnalyticsFunctions["📈 Analytics Functions<br>trackHabitCompletion()<br>trackMemoryOperation()"]
+  end
+ subgraph subGraph6["Data Storage"]
+        Supabase["🗄️ Supabase<br>Primary Database<br>Users, Memory History<br>RLS Enabled"]
+        IndexedDB["💾 IndexedDB<br>Local Storage<br>Habits, Completions<br>Offline Support"]
+        VectorStore["🧮 Vector Store<br>1536-dim Embeddings<br>Conversation Memory"]
+  end
+ subgraph subGraph7["Analytics & Monitoring"]
+        KeywordsAnalytics["📊 Keywords AI Analytics<br>Usage, Costs, Performance"]
+        CustomEvents["📈 Custom Events<br>Habit Completion<br>Memory Operations<br>Search Operations"]
+        Performance["⚡ Performance Monitoring<br>API Response Times<br>Query Performance"]
+  end
+ subgraph Security["Security"]
+        SupabaseAuth["🔐 Supabase Auth<br>JWT Tokens"]
+        RLS["🛡️ Row Level Security"]
+        CSRF["🔒 CSRF Protection"]
+        RateLimit["⏱️ Rate Limiting"]
+  end
+ subgraph subGraph9["External Services"]
+        TavilyAPI["🌐 Tavily API<br>Web Search<br>News Search<br>Quick Answers"]
+        KeywordsAPI["🔗 Keywords AI API<br>LLM Proxy<br>Analytics Platform"]
+        SupabaseCloud["☁️ Supabase Cloud<br>Hosted PostgreSQL"]
+  end
+    User["👤 User"] --> UI
+    UI --> Voice & Chat & Dashboard & Habits & Rewards & Profile & UserProvider & ChatProvider & DatabaseProvider & EventProvider
+    ChatProvider --> ChatAPI
+    UserProvider --> AuthAPI
+    DatabaseProvider --> SessionAPI
+    ChatAPI --> KeywordsAI & Mem0 & Tavily & CustomEvents & CSRF & RateLimit
+    KeywordsAI --> OpenAI & KeywordsAPI & KeywordsAnalytics
+    Tavily --> TavilyAPI
+    Mem0 --> Supabase
+    GeneralAgent --> DatabaseFunctions & MemoryFunctions & SearchFunctions & AnalyticsFunctions & KeywordsAI
+    HabitCoach --> DatabaseFunctions & MemoryFunctions & SearchFunctions & KeywordsAI
+    UserDataAgent --> DatabaseFunctions & KeywordsAI
+    PointsCalc --> DatabaseFunctions & KeywordsAI
+    RewardsManager --> DatabaseFunctions & KeywordsAI
+    Greeter --> DatabaseFunctions & KeywordsAI
+    DatabaseFunctions --> Supabase & IndexedDB & Performance
+    MemoryFunctions --> VectorStore & Supabase
+    Supabase --> SupabaseCloud & RLS
+    VectorStore --> Mem0
+    AuthAPI --> SupabaseAuth
+    Supabase -. "Real-time Sync" .-> IndexedDB
+    IndexedDB -. Offline First .-> Supabase
+    Mem0 -. Memory Sync .-> VectorStore
+    KeywordsAI -. Analytics .-> KeywordsAnalytics
+    Voice --> ChatAPI
+    Voice -. WebRTC .-> User
+    Voice -. "Real-time Audio" .-> ChatAPI
+    Dashboard -. Live Updates .-> DatabaseProvider
+    Habits -. Instant Updates .-> DatabaseProvider
+
+     User:::userClass
+     UI:::frontendClass
+     Voice:::frontendClass
+     Chat:::frontendClass
+     Dashboard:::frontendClass
+     Habits:::frontendClass
+     Rewards:::frontendClass
+     Profile:::frontendClass
+     KeywordsAI:::aiClass
+     OpenAI:::aiClass
+     Mem0:::aiClass
+     Tavily:::aiClass
+     GeneralAgent:::aiClass
+     HabitCoach:::aiClass
+     UserDataAgent:::aiClass
+     PointsCalc:::aiClass
+     RewardsManager:::aiClass
+     Greeter:::aiClass
+     Supabase:::storageClass
+     IndexedDB:::storageClass
+     VectorStore:::storageClass
+     KeywordsAnalytics:::analyticsClass
+     CustomEvents:::analyticsClass
+     Performance:::analyticsClass
+     SupabaseAuth:::securityClass
+     RLS:::securityClass
+     CSRF:::securityClass
+     RateLimit:::securityClass
+     SupabaseCloud:::storageClass
+    classDef userClass fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef frontendClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef aiClass fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef storageClass fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef securityClass fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef analyticsClass fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+
+
