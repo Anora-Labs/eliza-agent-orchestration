@@ -12,6 +12,13 @@ You are Wei, an experienced habit coach who helps users build better habits usin
 # User Data Access
 You have access to the user's profile, habits, completion history, points, streak, and recent activities. Use this information to provide highly personalized coaching that acknowledges their specific situation and progress.
 
+You also have access to a memory system that stores previous coaching conversations. Use this to:
+- Remember what coaching strategies worked best for each user
+- Recall user preferences and motivations
+- Track patterns in user behavior over time
+- Build on previous coaching sessions for continuity
+- Avoid repeating advice that didn't work
+
 # Core Coaching Principles
 1. **Start Small**: Encourage tiny habit changes that are easy to implement
 2. **Environment Design**: Help users modify their environment to make good habits easier
@@ -28,6 +35,9 @@ You have access to the user's profile, habits, completion history, points, strea
 4. Troubleshoot common habit obstacles
 5. Suggest habit modifications when users are struggling
 6. Explain the science behind habit formation in simple terms
+7. Remember successful coaching strategies and user preferences for future sessions
+8. Search previous conversations to understand what has and hasn't worked
+9. Store important insights about user motivation and behavior patterns
 
 # Communication Guidelines
 - Be warm and encouraging, but practical
@@ -78,6 +88,81 @@ You have access to the user's profile, habits, completion history, points, strea
         required: ["habitId"],
       },
     },
+    {
+      type: "function",
+      name: "searchMemories",
+      description: "Search through previous coaching conversations to understand user patterns and preferences",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The search query to find relevant coaching history"
+          },
+          limit: {
+            type: "number",
+            description: "Maximum number of memories to return (default: 5)"
+          }
+        },
+        required: ["query"]
+      }
+    },
+    {
+      type: "function",
+      name: "getRelevantMemories",
+      description: "Get coaching memories relevant to the current conversation context",
+      parameters: {
+        type: "object",
+        properties: {
+          currentMessage: {
+            type: "string",
+            description: "The current user message"
+          },
+          conversationHistory: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                role: { type: "string" },
+                content: { type: "string" }
+              }
+            },
+            description: "Recent conversation history for context"
+          },
+          limit: {
+            type: "number",
+            description: "Maximum number of relevant memories to return (default: 3)"
+          }
+        },
+        required: ["currentMessage"]
+      }
+    },
+    {
+      type: "function",
+      name: "addMemory",
+      description: "Store important coaching insights, user preferences, and successful strategies",
+      parameters: {
+        type: "object",
+        properties: {
+          messages: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                role: { type: "string" },
+                content: { type: "string" }
+              }
+            },
+            description: "Coaching conversation to store as memory"
+          },
+          metadata: {
+            type: "object",
+            description: "Additional metadata like coaching strategy used, user preferences discovered"
+          }
+        },
+        required: ["messages"]
+      }
+    }
   ],
   toolLogic: {
     getUserData: async () => {

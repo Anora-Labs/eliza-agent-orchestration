@@ -13,6 +13,12 @@ Your purpose is to help the user maintain healthy habits, celebrate their achiev
 # Key Information About the User
 You have access to the user's profile information, habits, points, streak, and recent activity. Use this information to personalize your responses and make them more relevant.
 
+You also have access to a powerful memory system that remembers previous conversations with the user. Use this to:
+- Search for relevant context from past conversations before responding
+- Remember user preferences, goals, and what works best for them
+- Build continuity across conversations
+- Store important details for future reference
+
 When the user asks about their habits, points, or progress, reference the actual data from their profile rather than asking them for this information.
 
 # Tasks You Can Help With
@@ -22,20 +28,28 @@ When the user asks about their habits, points, or progress, reference the actual
 4. Offer encouragement and celebrate achievements
 5. Answer questions about how the points system works
 6. Suggest habits based on the user's current habits and interests
+7. Search memories for relevant context about the user's past conversations
+8. Remember important details about user preferences and store them for future reference
+9. Build on previous conversations to create a personalized experience
 
 # Guidelines
 - Always respond in a way that's helpful and supportive
 - Be concise but friendly
-- Personalize responses based on the user's data
+- Personalize responses based on the user's data and memories
+- Before responding, consider searching memories for relevant context about the user
 - If completing a habit, confirm which habit and then use the completeHabit function
 - When referencing the user's habits, points, or other data, use the actual values from their profile
 - If the user asks about something not in their data, acknowledge this and offer to help them add it
 - Remember to consider the user's current streak and completion rate when providing encouragement
+- Store important conversation details (preferences, goals, achievements) using the addMemory function
+- Use getRelevantMemories to understand the current conversation context
 
 # Example Responses
 - When user completes a habit: "Great job completing your [habit name]! You've earned [points] points. Your current streak is [streak] days and you now have [total points] points."
 - When user asks about their points: "You currently have [points] points. You could redeem these for [reward name] which costs [cost] points."
 - When user asks about their habits: "You're currently tracking [number] habits, including [list a few examples]. Your completion rate is [rate]%."
+- When leveraging memories: "I remember you mentioned [relevant detail from memory]. Based on that and your current progress..."
+- When storing important info: "I'll remember that [important detail] for our future conversations so I can better support your goals."
 
 Remember to be personable while staying focused on helping the user maintain their wellbeing habits.
 `,
@@ -67,6 +81,81 @@ Remember to be personable while staying focused on helping the user maintain the
                 required: ["habitId"],
             },
         },
+        {
+            type: "function",
+            name: "searchMemories",
+            description: "Search through the user's memories to find relevant information from past conversations",
+            parameters: {
+                type: "object",
+                properties: {
+                    query: {
+                        type: "string",
+                        description: "The search query to find relevant memories"
+                    },
+                    limit: {
+                        type: "number",
+                        description: "Maximum number of memories to return (default: 5)"
+                    }
+                },
+                required: ["query"]
+            }
+        },
+        {
+            type: "function",
+            name: "getRelevantMemories",
+            description: "Get memories relevant to the current conversation context",
+            parameters: {
+                type: "object",
+                properties: {
+                    currentMessage: {
+                        type: "string",
+                        description: "The current user message"
+                    },
+                    conversationHistory: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                role: { type: "string" },
+                                content: { type: "string" }
+                            }
+                        },
+                        description: "Recent conversation history for context"
+                    },
+                    limit: {
+                        type: "number",
+                        description: "Maximum number of relevant memories to return (default: 3)"
+                    }
+                },
+                required: ["currentMessage"]
+            }
+        },
+        {
+            type: "function",
+            name: "addMemory",
+            description: "Store important information from the current conversation for future reference",
+            parameters: {
+                type: "object",
+                properties: {
+                    messages: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                role: { type: "string" },
+                                content: { type: "string" }
+                            }
+                        },
+                        description: "Conversation messages to store as memories"
+                    },
+                    metadata: {
+                        type: "object",
+                        description: "Additional metadata for the memory"
+                    }
+                },
+                required: ["messages"]
+            }
+        }
     ],
     toolLogic: {
         getUserData: async () => {

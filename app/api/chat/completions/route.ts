@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { memoryService } from "@/lib/memory";
+import { createClient } from "@/lib/supabase/server";
 
 const openai = new OpenAI();
 
@@ -122,8 +124,124 @@ const defaultFunctions = [
       },
       required: ["habitId", "basePoints"]
     }
+  },
+  {
+    name: "searchMemories",
+    description: "Search through the user's memories to find relevant information",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "The search query to find relevant memories"
+        },
+        limit: {
+          type: "number",
+          description: "Maximum number of memories to return (default: 5)"
+        }
+      },
+      required: ["query"]
+    }
+  },
+  {
+    name: "getAllMemories",
+    description: "Get all memories for the current user",
+    parameters: {
+      type: "object",
+      properties: {
+        limit: {
+          type: "number",
+          description: "Maximum number of memories to return"
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: "addMemory",
+    description: "Store new memories from the current conversation",
+    parameters: {
+      type: "object",
+      properties: {
+        messages: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              role: { type: "string" },
+              content: { type: "string" }
+            }
+          },
+          description: "Conversation messages to store as memories"
+        },
+        metadata: {
+          type: "object",
+          description: "Additional metadata for the memory"
+        }
+      },
+      required: ["messages"]
+    }
+  },
+  {
+    name: "deleteMemory",
+    description: "Delete a specific memory by ID",
+    parameters: {
+      type: "object",
+      properties: {
+        memoryId: {
+          type: "string",
+          description: "The ID of the memory to delete"
+        }
+      },
+      required: ["memoryId"]
+    }
+  },
+  {
+    name: "getRelevantMemories",
+    description: "Get memories relevant to the current conversation context",
+    parameters: {
+      type: "object",
+      properties: {
+        currentMessage: {
+          type: "string",
+          description: "The current user message"
+        },
+        conversationHistory: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              role: { type: "string" },
+              content: { type: "string" }
+            }
+          },
+          description: "Recent conversation history for context"
+        },
+        limit: {
+          type: "number",
+          description: "Maximum number of relevant memories to return (default: 3)"
+        }
+      },
+      required: ["currentMessage"]
+    }
   }
 ];
+
+// Helper function to get user ID from session
+async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+    return user.id;
+  } catch (error) {
+    console.error('Error in getCurrentUserId:', error);
+    return null;
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -418,6 +536,125 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
         totalBonus,
         totalPoints: args.basePoints + totalBonus
       });
+
+    // Memory functions
+    case "searchMemories":
+      const userId = await getCurrentUserId();
+      if (!userId) {
+        return JSON.stringify({
+          error: "User not authenticated",
+          memories: []
+        });
+      }
+      
+      try {
+        const memories = await memoryService.searchMemories(
+          args.query,
+          userId,
+          args.limit || 5
+        );
+        return JSON.stringify({
+          memories,
+          count: Array.isArray(memories) ? memories.length : 0
+        });
+      } catch (error) {
+        console.error('Error searching memories:', error);
+        return JSON.stringify({
+          error: "Failed to search memories",
+          memories: []
+        });
+      }
+
+    case "getAllMemories":
+      const userIdForAll = await getCurrentUserId();
+      if (!userIdForAll) {
+        return JSON.stringify({
+          error: "User not authenticated",
+          memories: []
+        });
+      }
+      
+      try {
+        const allMemories = await memoryService.getAllMemories(userIdForAll);
+        return JSON.stringify({
+          memories: allMemories,
+          count: Array.isArray(allMemories) ? allMemories.length : 0
+        });
+      } catch (error) {
+        console.error('Error getting all memories:', error);
+        return JSON.stringify({
+          error: "Failed to get memories",
+          memories: []
+        });
+      }
+
+    case "addMemory":
+      const userIdForAdd = await getCurrentUserId();
+      if (!userIdForAdd) {
+        return JSON.stringify({
+          error: "User not authenticated",
+          success: false
+        });
+      }
+      
+      try {
+        const result = await memoryService.addMemories(
+          args.messages,
+          userIdForAdd,
+          args.metadata
+        );
+        return JSON.stringify({
+          success: true,
+          message: "Memory added successfully",
+          memoryId: result
+        });
+      } catch (error) {
+        console.error('Error adding memory:', error);
+        return JSON.stringify({
+          error: "Failed to add memory",
+          success: false
+        });
+      }
+
+    case "deleteMemory":
+      try {
+        const result = await memoryService.deleteMemory(args.memoryId);
+        return JSON.stringify(result);
+      } catch (error) {
+        console.error('Error deleting memory:', error);
+        return JSON.stringify({
+          error: "Failed to delete memory",
+          success: false
+        });
+      }
+
+    case "getRelevantMemories":
+      const userIdForRelevant = await getCurrentUserId();
+      if (!userIdForRelevant) {
+        return JSON.stringify({
+          error: "User not authenticated",
+          memories: []
+        });
+      }
+      
+      try {
+        const relevantMemories = await memoryService.getRelevantMemories(
+          args.currentMessage,
+          userIdForRelevant,
+          args.conversationHistory || [],
+          args.limit || 3
+        );
+        return JSON.stringify({
+          memories: relevantMemories,
+          count: Array.isArray(relevantMemories) ? relevantMemories.length : 0
+        });
+      } catch (error) {
+        console.error('Error getting relevant memories:', error);
+        return JSON.stringify({
+          error: "Failed to get relevant memories",
+          memories: []
+        });
+      }
 
     default:
       return JSON.stringify({
