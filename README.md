@@ -167,6 +167,8 @@ SUPABASE_SERVICE_ROLE=your_supabase_service_role_key
 > **☁️ Deploy Now**: Deploy your own Eliza Agent Orchestration now! Check out the [DEPLOY.md](./DEPLOY.md).
 >
 > **📖 Architecture Deep Dive**: For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+>
+> **🔍 Interactive Architecture**: For a more interactive architecture diagram, navigate to `/architecture-svg` or `/architecture` to see the architecture diagram.
 
 ### Integration Documentation:
 - [Keywords AI Integration](./KEYWORDS_AI_INTEGRATION.md) - LLM gateway and analytics setup

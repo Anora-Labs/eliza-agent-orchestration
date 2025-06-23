@@ -15,7 +15,7 @@ export default function InfoPage({
   const isMobile = useIsMobile();
   const pathname = usePathname();
 
-  if (!isMobile && pathname !== "/") {
+  if ((!isMobile && pathname !== "/") && (pathname !== "/architecture" && pathname !== "/architecture-svg")) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center p-8">
