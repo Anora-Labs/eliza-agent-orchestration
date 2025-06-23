@@ -3,8 +3,15 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Providers } from "./providers";
 import { usePathname } from "next/navigation";
+import type { UserProfile } from "@/types/user";
 
-export default function InfoPage({ children }: { children: React.ReactNode }) {
+export default function InfoPage({ 
+  children, 
+  initialUser 
+}: { 
+  children: React.ReactNode;
+  initialUser: UserProfile | null;
+}) {
   const isMobile = useIsMobile();
   const pathname = usePathname();
 
@@ -20,5 +27,5 @@ export default function InfoPage({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <Providers>{children}</Providers>;
+  return <Providers initialUser={initialUser}>{children}</Providers>;
 }

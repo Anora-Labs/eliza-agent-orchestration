@@ -12,27 +12,37 @@ import { usePathname } from "next/navigation";
 import { DBLoader } from "./components/DBLoader";
 import WhatsNewInfo from "./components/updates/WhatsNewInfo";
 import { FeedbackWidget } from "./components/feedback-widget";
+import { UserProvider } from "@/providers/user-provider";
+import type { UserProfile } from "@/types/user";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ 
+  children, 
+  initialUser 
+}: { 
+  children: React.ReactNode;
+  initialUser: UserProfile | null;
+}) {
   const pathname = usePathname();
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem forcedTheme={pathname === "/" ? undefined : "dark"}>
-      <DatabaseProvider>
-        <DBLoader>
-          <UserCacheProvider>
-            <ChatProvider>
-              <EventProvider>
-                <TranscriptProvider>
-                  {pathname !== "/" && <WhatsNewInfo />}
-                  {children}
-                  {pathname !== "/" && <RealTimeStreamingMode />}
-                  {pathname === "/" && <FeedbackWidget />}
-                </TranscriptProvider>
-              </EventProvider>
-            </ChatProvider>
-          </UserCacheProvider>
-        </DBLoader>
-      </DatabaseProvider>
+      <UserProvider initialUser={initialUser}>
+        <DatabaseProvider>
+          <DBLoader>
+            <UserCacheProvider>
+              <ChatProvider>
+                <EventProvider>
+                  <TranscriptProvider>
+                    {pathname !== "/" && <WhatsNewInfo />}
+                    {children}
+                    {pathname !== "/" && <RealTimeStreamingMode />}
+                    {pathname === "/" && <FeedbackWidget />}
+                  </TranscriptProvider>
+                </EventProvider>
+              </ChatProvider>
+            </UserCacheProvider>
+          </DBLoader>
+        </DatabaseProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 } 

@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useDatabase } from "@/app/contexts/DatabaseContext";
+import { useUser } from "@/providers/user-provider";
 import { toast } from "sonner";
 import { WeiDB } from "@/app/types/database";
 import EditProfileDrawer from "./EditProfileDrawer";
@@ -34,19 +35,33 @@ interface Achievement {
 }
 
 export default function ProfileDashboard() {
-  const { userPoints, getCompletions, getHabits, getUserProfile, saveUserProfile, getRewardRedemptions, getUserData, getRewards } = useDatabase();
+  // Use UserProvider for Supabase user data
+  const { user, updateUser, isLoading: userLoading } = useUser();
+  
+  // Use DatabaseContext for habits/rewards data (transitional)
+  const { userPoints, getCompletions, getHabits, getUserData, getRewardRedemptions, getRewards } = useDatabase();
+  
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-  const [profileData, setProfileData] = useState<WeiDB['userProfile']['value']>({
+  
+  // Profile data now comes from Supabase user
+  const [profileData, setProfileData] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    bio: string;
+    avatarUrl: string;
+    joinDate: string;
+  }>({
     id: 'default',
     name: "User",
-    email: "user@example.com",
+    email: "user@example.com", 
     bio: "No bio yet",
     avatarUrl: "",
     joinDate: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   });
   
-  const [editableProfileData, setEditableProfileData] = useState<WeiDB['userProfile']['value']>(profileData);
+  const [editableProfileData, setEditableProfileData] = useState(profileData);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [streak, setStreak] = useState(0);
@@ -54,22 +69,27 @@ export default function ProfileDashboard() {
   const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   
-  // Load user profile from IndexedDB
+  // Load user profile from Supabase user data
   useEffect(() => {
-    const loadUserProfile = async () => {
-      try {
-        const profile = await getUserProfile();
-        if (profile) {
-          setProfileData(profile);
-          setEditableProfileData(profile);
-        }
-      } catch (error) {
-        console.error('Failed to load user profile:', error);
-      }
-    };
+    console.log('ProfileDashboard - Loading user profile from Supabase user data');
+    console.log('ProfileDashboard - User object:', user);
+    console.log('ProfileDashboard - User loading state:', userLoading);
     
-    loadUserProfile();
-  }, [getUserProfile]);
+    if (user) {
+      const userProfileData = {
+        id: user.id,
+        name: user.display_name || "User",
+        email: user.email,
+        bio: "No bio yet", // You can add bio field to Supabase users table later
+        avatarUrl: user.profile_image || "",
+        joinDate: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      };
+      
+      console.log('ProfileDashboard - Setting profile data:', userProfileData);
+      setProfileData(userProfileData);
+      setEditableProfileData(userProfileData);
+    }
+  }, [user, userLoading]);
   
   // Load achievements - Define based on real user data
   useEffect(() => {
@@ -236,18 +256,22 @@ export default function ProfileDashboard() {
         });
       }
       
-      // Create updated profile data
+      // Create updated profile data for Supabase
       const updatedProfile = {
-        ...editableProfileData,
-        avatarUrl,
-        id: 'default', // Ensure we're using the same ID
+        display_name: editableProfileData.name,
+        profile_image: avatarUrl,
+        // Add other fields as needed
       };
       
-      // Save to IndexedDB
-      await saveUserProfile(updatedProfile);
+      // Update profile in Supabase
+      await updateUser(updatedProfile);
       
-      // Update state
-      setProfileData(updatedProfile);
+      // Update local state
+      setProfileData({
+        ...profileData,
+        name: editableProfileData.name,
+        avatarUrl,
+      });
       setIsEditDrawerOpen(false);
       setImageFile(null);
       setImagePreview(null);
@@ -258,6 +282,31 @@ export default function ProfileDashboard() {
       toast.error('Failed to update profile');
     }
   };
+
+  // Show loading state
+  if (!userLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-20 w-20 bg-gray-300 rounded-full"></div>
+          <div className="h-4 bg-gray-300 rounded w-32 mt-2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if user is not logged in
+  if (!user) {
+    return (
+      <div className="space-y-4">
+        <Card className="bg-transparent border-none shadow-none">
+          <CardContent className="p-4 text-center">
+            <p className="text-muted-foreground">Please log in to view your profile.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-4">
