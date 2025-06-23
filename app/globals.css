@@ -127,7 +127,7 @@
   }
 
   .dark ::selection {
-    @apply bg-primary text-primary-foreground;
+    @apply bg-white text-primary-foreground;
   }
 }
 
