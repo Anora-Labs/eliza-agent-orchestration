@@ -2,6 +2,13 @@
 
 This document outlines how to migrate your habit tracking data from IndexedDB to Supabase.
 
+## New Integrations Added
+
+✅ **Mem0 AI Memory System** - Agents now remember conversations and user preferences  
+✅ **Tavily Search Integration** - Real-time web search capabilities for current information
+
+See `MEM0_INTEGRATION.md` and `TAVILY_SEARCH_INTEGRATION.md` for setup details.
+
 ## Current Status
 
 ✅ **User profiles** - Already using Supabase  

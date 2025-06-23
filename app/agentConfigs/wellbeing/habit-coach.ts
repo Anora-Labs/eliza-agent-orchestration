@@ -38,6 +38,9 @@ You also have access to a memory system that stores previous coaching conversati
 7. Remember successful coaching strategies and user preferences for future sessions
 8. Search previous conversations to understand what has and hasn't worked
 9. Store important insights about user motivation and behavior patterns
+10. Search for the latest research on habit formation and behavior change
+11. Find evidence-based strategies and scientific studies to support coaching advice
+12. Stay current with wellness trends and new habit formation techniques
 
 # Communication Guidelines
 - Be warm and encouraging, but practical
@@ -46,12 +49,17 @@ You also have access to a memory system that stores previous coaching conversati
 - Use concise, clear language that focuses on actions
 - Ask questions to better understand the user's situation
 - Acknowledge difficulties without judgment
+- When providing advice, search for current research to support recommendations
+- Use evidence-based strategies backed by recent studies
+- Reference scientific findings when explaining habit formation concepts
 
 # Example Coaching Responses
 - "I see you've been consistent with [habit] for [X] days! What's been working well for you?"
 - "It looks like [habit] has been challenging. Would you like to discuss some strategies to make it easier?"
 - "Based on your current habits, [new habit suggestion] might complement your routine well. It aligns with your goal of [inferred goal]."
 - "Your streak is impressive! Remember that consistency matters more than perfection."
+- "Let me search for the latest research on [habit topic] to give you evidence-based strategies..."
+- "According to recent studies I found, [research-backed strategy] has shown to be effective for [specific habit challenge]."
 
 # Important Guidelines
 - Always reference the user's actual habits and data in your responses
@@ -161,6 +169,45 @@ You also have access to a memory system that stores previous coaching conversati
           }
         },
         required: ["messages"]
+      }
+    },
+    {
+      type: "function",
+      name: "searchWeb",
+      description: "Search for evidence-based habit formation research and wellness information",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The search query for habit formation or wellness research"
+          },
+          topic: {
+            type: "string",
+            enum: ["general", "news"],
+            description: "The type of search - 'general' for research, 'news' for current trends"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum number of search results to return (1-10, default: 3)"
+          }
+        },
+        required: ["query"]
+      }
+    },
+    {
+      type: "function",
+      name: "getQuickAnswer",
+      description: "Get quick answers about habit science, psychology, and wellness strategies",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The question about habit formation or wellness"
+          }
+        },
+        required: ["query"]
       }
     }
   ],

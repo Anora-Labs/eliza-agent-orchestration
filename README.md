@@ -27,6 +27,8 @@
 
 </p>
 
+Twit us! https://x.com/abdibrokhim/status/1937049784776585483
+
 <br>
 
 <div align="center">

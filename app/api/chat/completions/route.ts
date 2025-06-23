@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { memoryService } from "@/lib/memory";
+import { tavilyService } from "@/lib/tavily";
 import { createClient } from "@/lib/supabase/server";
 
 const openai = new OpenAI();
@@ -221,11 +222,80 @@ const defaultFunctions = [
           type: "number",
           description: "Maximum number of relevant memories to return (default: 3)"
         }
-      },
-      required: ["currentMessage"]
+              },
+        required: ["currentMessage"]
+      }
+    },
+    {
+      name: "searchWeb",
+      description: "Search the internet for real-time information and current events",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The search query to find information on the web"
+          },
+          topic: {
+            type: "string",
+            enum: ["general", "news"],
+            description: "The type of search - 'general' for broad searches, 'news' for current events (default: general)"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum number of search results to return (1-20, default: 5)"
+          },
+          time_range: {
+            type: "string",
+            enum: ["day", "week", "month", "year"],
+            description: "Time range for news searches (only applicable when topic is 'news')"
+          },
+          include_answer: {
+            type: "boolean",
+            description: "Whether to include an AI-generated answer summary (default: true)"
+          }
+        },
+        required: ["query"]
+      }
+    },
+    {
+      name: "searchNews",
+      description: "Search for recent news and current events",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The news search query"
+          },
+          max_results: {
+            type: "number",
+            description: "Maximum number of news results to return (1-20, default: 5)"
+          },
+          time_range: {
+            type: "string",
+            enum: ["day", "week", "month"],
+            description: "How recent the news should be (default: week)"
+          }
+        },
+        required: ["query"]
+      }
+    },
+    {
+      name: "getQuickAnswer",
+      description: "Get a quick, concise answer to a factual question using web search",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The question to get a quick answer for"
+          }
+        },
+        required: ["query"]
+      }
     }
-  }
-];
+  ];
 
 // Helper function to get user ID from session
 async function getCurrentUserId(): Promise<string | null> {
@@ -653,6 +723,80 @@ async function handleDatabaseFunction(name: string, args: any, userCache: any) {
         return JSON.stringify({
           error: "Failed to get relevant memories",
           memories: []
+        });
+      }
+
+    // Search functions
+    case "searchWeb":
+      try {
+        console.log("Searching web with query:", args.query);
+        const searchResponse = await tavilyService.search({
+          query: args.query,
+          topic: args.topic || 'general',
+          max_results: Math.min(Math.max(args.max_results || 5, 1), 20),
+          time_range: args.time_range,
+          include_answer: args.include_answer !== false,
+        });
+        
+        return JSON.stringify({
+          success: true,
+          query: searchResponse.query,
+          answer: searchResponse.answer,
+          results: searchResponse.results,
+          response_time: searchResponse.response_time,
+          formatted_results: tavilyService.formatSearchResults(searchResponse)
+        });
+      } catch (error) {
+        console.error('Error searching web:', error);
+        return JSON.stringify({
+          error: "Failed to search the web",
+          success: false,
+          message: error instanceof Error ? error.message : "Unknown search error"
+        });
+      }
+
+    case "searchNews":
+      try {
+        console.log("Searching news with query:", args.query);
+        const newsResponse = await tavilyService.searchNews(
+          args.query,
+          Math.min(Math.max(args.max_results || 5, 1), 20),
+          args.time_range || 'week'
+        );
+        
+        return JSON.stringify({
+          success: true,
+          query: newsResponse.query,
+          answer: newsResponse.answer,
+          results: newsResponse.results,
+          response_time: newsResponse.response_time,
+          formatted_results: tavilyService.formatSearchResults(newsResponse)
+        });
+      } catch (error) {
+        console.error('Error searching news:', error);
+        return JSON.stringify({
+          error: "Failed to search news",
+          success: false,
+          message: error instanceof Error ? error.message : "Unknown search error"
+        });
+      }
+
+    case "getQuickAnswer":
+      try {
+        console.log("Getting quick answer with query:", args.query);
+        const answer = await tavilyService.getQuickAnswer(args.query);
+        
+        return JSON.stringify({
+          success: true,
+          query: args.query,
+          answer: answer
+        });
+      } catch (error) {
+        console.error('Error getting quick answer:', error);
+        return JSON.stringify({
+          error: "Failed to get quick answer",
+          success: false,
+          message: error instanceof Error ? error.message : "Unknown search error"
         });
       }
 

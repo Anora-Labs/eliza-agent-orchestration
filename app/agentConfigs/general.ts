@@ -31,6 +31,9 @@ When the user asks about their habits, points, or progress, reference the actual
 7. Search memories for relevant context about the user's past conversations
 8. Remember important details about user preferences and store them for future reference
 9. Build on previous conversations to create a personalized experience
+10. Search the web for real-time information on health, wellness, and current events
+11. Get quick answers to factual questions using web search
+12. Find recent news related to health, fitness, and wellness trends
 
 # Guidelines
 - Always respond in a way that's helpful and supportive
@@ -43,6 +46,9 @@ When the user asks about their habits, points, or progress, reference the actual
 - Remember to consider the user's current streak and completion rate when providing encouragement
 - Store important conversation details (preferences, goals, achievements) using the addMemory function
 - Use getRelevantMemories to understand the current conversation context
+- When users ask about current events, trends, or need factual information, use web search functions
+- For health and wellness questions requiring up-to-date information, search the web before responding
+- Use searchNews for current events and getQuickAnswer for factual questions
 
 # Example Responses
 - When user completes a habit: "Great job completing your [habit name]! You've earned [points] points. Your current streak is [streak] days and you now have [total points] points."
@@ -50,6 +56,8 @@ When the user asks about their habits, points, or progress, reference the actual
 - When user asks about their habits: "You're currently tracking [number] habits, including [list a few examples]. Your completion rate is [rate]%."
 - When leveraging memories: "I remember you mentioned [relevant detail from memory]. Based on that and your current progress..."
 - When storing important info: "I'll remember that [important detail] for our future conversations so I can better support your goals."
+- When using web search: "Let me search for the latest information about [topic]..." followed by current, accurate information
+- When asked about current events: "Here's what I found about recent [topic] news..." with up-to-date information
 
 Remember to be personable while staying focused on helping the user maintain their wellbeing habits.
 `,
@@ -154,6 +162,69 @@ Remember to be personable while staying focused on helping the user maintain the
                     }
                 },
                 required: ["messages"]
+            }
+        },
+        {
+            type: "function",
+            name: "searchWeb",
+            description: "Search the internet for real-time information and current events",
+            parameters: {
+                type: "object",
+                properties: {
+                    query: {
+                        type: "string",
+                        description: "The search query to find information on the web"
+                    },
+                    topic: {
+                        type: "string",
+                        enum: ["general", "news"],
+                        description: "The type of search - 'general' for broad searches, 'news' for current events"
+                    },
+                    max_results: {
+                        type: "number",
+                        description: "Maximum number of search results to return (1-20, default: 5)"
+                    }
+                },
+                required: ["query"]
+            }
+        },
+        {
+            type: "function",
+            name: "searchNews",
+            description: "Search for recent news and current events",
+            parameters: {
+                type: "object",
+                properties: {
+                    query: {
+                        type: "string",
+                        description: "The news search query"
+                    },
+                    max_results: {
+                        type: "number",
+                        description: "Maximum number of news results to return"
+                    },
+                    time_range: {
+                        type: "string",
+                        enum: ["day", "week", "month"],
+                        description: "How recent the news should be"
+                    }
+                },
+                required: ["query"]
+            }
+        },
+        {
+            type: "function",
+            name: "getQuickAnswer",
+            description: "Get a quick, concise answer to a factual question using web search",
+            parameters: {
+                type: "object",
+                properties: {
+                    query: {
+                        type: "string",
+                        description: "The question to get a quick answer for"
+                    }
+                },
+                required: ["query"]
             }
         }
     ],
