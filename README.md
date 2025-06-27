@@ -10,7 +10,7 @@
     <img src="./public/assets/wei-agents-banner.png" alt=banner>
   </a>
 </div>
-
+ke
 </br>
 
 <div align="left">
@@ -23,7 +23,7 @@
 <p align="left">
   <img src="./public/wei-agent-architecture.svg" alt=architecture style="width: 100%; height: auto; background-color: #f0f0f0;">
 
-🌱 **Wei** is your enterprise-grade conversational AI agent that transforms habit-building through natural dialogue, persistent memory, and real-time intelligence. Powered by **Keywords AI** (250+ models), **Mem0** memory system, and **Tavily** search - Wei provides personalized, contextual, and evidence-based wellness coaching with complete observability and analytics.
+🌱 **Wei** is your enterprise-grade conversational AI agent that transforms habit-building through natural dialogue, persistent memory, and real-time intelligence. Powered by **Keywords AI** (250+ models), **Mem0** with **Supabase** memory system, and **Tavily** search - Wei provides personalized, contextual, and evidence-based wellness coaching with complete observability and analytics.
 
 </p>
 
